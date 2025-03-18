@@ -27,6 +27,7 @@ class LLMTradingAnalyzer {
     url: string;
     name: string;
   };
+  private readonly DEFAULT_CONFIDENCE_THRESHOLD = 60;
 
   constructor(apiKey: string, siteUrl: string = '', siteName: string = '') {
     this.openai = new OpenAI({
@@ -43,7 +44,8 @@ class LLMTradingAnalyzer {
   async analyzeTradingDecision(
       scraperResult: ScraperResult,
       cryptoSymbol: string,
-      modelName: string = 'google/gemini-2.0-flash-001'
+      modelName: string = 'google/gemini-2.0-flash-001',
+      confidenceThreshold: number = this.DEFAULT_CONFIDENCE_THRESHOLD
   ): Promise<TradingRecommendation> {
     try {
       // Create a prompt for the API
@@ -52,12 +54,21 @@ class LLMTradingAnalyzer {
       // Call the OpenRouter API
       const response = await this.openai.chat.completions.create({
         model: modelName,
-        max_tokens: 1000,
-        temperature: 0.2,
+        max_tokens: 1200,
+        temperature: 0.1,
         messages: [
           {
             role: "system",
-            content: "You are a cryptocurrency trading expert analyzing Twitter sentiment. You MUST respond ONLY with the JSON object as specified in the prompt, no other text."
+            content: "You are a cryptocurrency trading expert analyzing Twitter sentiment. " + "Your analysis must be Balanced and evidence-based,Skeptical of hype " +
+                "or excessive negativity,Conservative in confidence scores (only >80 for strong signals)" + "The guidelines for recommendation are  BUY: Recommend " +
+                "only with strong positive signals AND price not recently pumped ,  SELL : Recommend only with strong negative signals AND declining sentiment, " +
+                "HOLD: Default position when signals are mixed or weak" + "Confidence scoring:\n" +
+                "            - 80-100: Very strong conviction with multiple confirming signals\n" +
+                "            - 60-79: Moderate conviction with some confirming signals\n" +
+                "            - 0-59: Low conviction or mixed signals\n" +
+                "  you must answer in great detail and give a very detailed resposnse       "+
+
+                "You MUST respond ONLY with the JSON object as specified in the prompt, no other text."
           },
           { role: "user", content: prompt }
         ]
@@ -79,8 +90,7 @@ class LLMTradingAnalyzer {
           throw new Error("No JSON found in response");
         }
 
-        const recommendation = JSON.parse(jsonMatch[0]) as TradingRecommendation;
-        return recommendation;
+        return JSON.parse(jsonMatch[0]) as TradingRecommendation;
       } catch (parseError) {
         console.error("Failed to parse API response:", parseError);
         // Return a default recommendation if parsing fails
