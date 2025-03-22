@@ -2,20 +2,175 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-	--background: #ffffff;
-	--foreground: #171717;
-}
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
 
-@media (prefers-color-scheme: dark) {
-	:root {
-		--background: #0a0a0a;
-		--foreground: #ededed;
-	}
+:root {
+	/* Base colors */
+	--background-primary: #0A0E17;
+	--background-secondary: #151A24;
+	--accent-primary: #6847FF;
+	--accent-hover: #5434FF;
+	--text-primary: #E8EAED;
+	--text-secondary: #A7A7B8;
+	--success: #34C759;
+	--alert: #FF9500;
+	--border-light: #2A2F3C;
+	--code-background: #1A1E29;
+	--inline-code-background: #1E2639;
+
+	/* Component-specific */
+	--user-bubble: #27303F;
+	--assistant-bubble: #1A2235;
+	--chat-bubble-border: var(--border-light);
+	--input-background: var(--background-secondary);
+	--input-border: var(--border-light);
+	--button-background: var(--accent-primary);
+	--button-hover: var(--accent-hover);
+	--header-border: var(--border-light);
+	--code-block-background: var(--code-background);
 }
 
 body {
-	color: var(--foreground);
-	background: var(--background);
-	font-family: Arial, Helvetica, sans-serif;
+	color: var(--text-primary);
+	background: var(--background-primary);
+	font-family: system-ui, sans-serif;
+	font-size: 16px;
+	line-height: 1.5;
+	-webkit-font-smoothing: antialiased;
+	letter-spacing: 0.01em;
+	text-wrap: pretty;
+	word-break: break-word;
+	overflow-wrap: break-word;
+}
+
+/* Typography */
+h1, h2, h3, h4, h5, h6 {
+	font-weight: 600;
+	letter-spacing: -0.02em;
+}
+
+/* Futuristic Elements */
+button, input, textarea {
+	border-radius: 8px;
+	transition: all 0.2s ease-in-out;
+}
+
+button:not(:disabled):hover {
+	transform: translateY(-1px);
+	box-shadow: 0 4px 12px rgba(104, 71, 255, 0.15);
+}
+
+/* Glowing effect for important elements */
+h1, .accent-glow {
+	text-shadow: 0 0 8px rgba(104, 71, 255, 0.3);
+}
+
+/* Input and button styling */
+input:focus, textarea:focus {
+	box-shadow: 0 0 0 2px var(--accent-primary);
+}
+
+/* Text wrapping */
+p, div, span, li, code, pre, textarea {
+	overflow-wrap: break-word;
+	word-wrap: break-word;
+	word-break: break-word;
+	hyphens: auto;
+}
+
+/* Prose Styles */
+.prose {
+	font-size: 16px;
+	line-height: 1.6;
+	color: var(--text-primary);
+	white-space: pre-wrap;
+}
+
+.prose p {
+	margin-top: 1.25em;
+	margin-bottom: 1.25em;
+	white-space: pre-wrap;
+	word-break: break-word;
+}
+
+.prose code {
+	color: var(--text-primary);
+	background-color: var(--inline-code-background);
+	padding: 0.2em 0.4em;
+	border-radius: 4px;
+	font-size: 0.875em;
+	font-family: "SF Mono", "Consolas", monospace;
+	white-space: pre-wrap;
+	word-break: break-all;
+}
+
+.prose pre {
+	background-color: var(--code-block-background);
+	border: 1px solid var(--border-light);
+	border-radius: 8px;
+	padding: 1em;
+	margin: 1.5em 0;
+	overflow-x: auto;
+	white-space: pre-wrap;
+}
+
+.prose pre code {
+	background-color: transparent;
+	padding: 0;
+	border-radius: 0;
+	color: inherit;
+	white-space: pre-wrap;
+}
+
+/* Animations */
+@keyframes fadeIn {
+	from { opacity: 0; transform: translateY(10px); }
+	to { opacity: 1; transform: translateY(0); }
+}
+
+.message-enter {
+	animation: fadeIn 0.3s ease-out forwards;
+}
+
+/* Pulse animation for loading states */
+@keyframes pulse {
+	0% { opacity: 1; }
+	50% { opacity: 0.6; }
+	100% { opacity: 1; }
+}
+
+.pulse {
+	animation: pulse 1.5s ease-in-out infinite;
+}
+
+/* Accessibility */
+:focus-visible {
+	outline: 2px solid var(--accent-primary);
+	outline-offset: 2px;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+	width: 6px;
+	height: 6px;
+}
+
+::-webkit-scrollbar-track {
+	background: var(--background-primary);
+}
+
+::-webkit-scrollbar-thumb {
+	background: var(--border-light);
+	border-radius: 8px;
+	opacity: 0.6;
+}
+
+::-webkit-scrollbar-thumb:hover {
+	background: var(--accent-primary);
+}
+
+/* Input placeholder */
+::placeholder {
+	color: var(--text-secondary);
+	opacity: 0.7;
 }
