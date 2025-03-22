@@ -1,7 +1,7 @@
 import type { AccountAddress, Aptos, MoveStructId } from "@aptos-labs/ts-sdk"
 import { AptosPriceServiceConnection } from "@pythnetwork/pyth-aptos-js"
-import { priceFeed } from "../move-agent-kit-main/src/constants/price-feed"
-import type { BaseSigner } from "../move-agent-kit-main/src/signers"
+import { priceFeed } from "./constants/price-feed"
+import type { BaseSigner } from "./signers"
 import {
 	borrowToken,
 	burnNFT,
@@ -23,30 +23,30 @@ import {
 	transferTokens,
 	unstakeTokens,
 	withdrawToken,
-} from "../move-agent-kit-main/src/tools"
+} from "./tools"
 import {
 	borrowAriesToken,
 	createAriesProfile,
 	lendAriesToken,
 	repayAriesToken,
 	withdrawAriesToken,
-} from "../move-agent-kit-main/src/tools/aries"
+} from "./tools/aries"
 import {
 	borrowTokenWithEchelon,
 	lendTokenWithEchelon,
 	repayTokenWithEchelon,
 	withdrawTokenWithEchelon,
-} from "../move-agent-kit-main/src/tools/echelon"
-import { stakeTokenWithEcho, unstakeTokenWithEcho } from "../move-agent-kit-main/src/tools/echo"
-import { addLiquidity, createPool, removeLiquidity, swap } from "../move-agent-kit-main/src/tools/liquidswap"
+} from "./tools/echelon"
+import { stakeTokenWithEcho, unstakeTokenWithEcho } from "./tools/echo"
+import { addLiquidity, createPool, removeLiquidity, swap } from "./tools/liquidswap"
 import {
 	closePositionWithMerkleTrade,
 	getPositionsWithMerkleTrade,
 	placeLimitOrderWithMerkleTrade,
 	placeMarketOrderWithMerkleTrade,
-} from "../move-agent-kit-main/src/tools/merkletrade"
-import { createImage } from "../move-agent-kit-main/src/tools/openai"
-import { swapWithPanora } from "../move-agent-kit-main/src/tools/panora"
+} from "./tools/merkletrade"
+import { createImage } from "./tools/openai"
+import { swapWithPanora } from "./tools/panora"
 import {
 	addLiquidityWithThala,
 	createPoolWithThala,
@@ -55,9 +55,9 @@ import {
 	removeLiquidityWithThala,
 	stakeTokenWithThala,
 	unstakeAPTWithThala,
-} from "../move-agent-kit-main/src/tools/thala"
-import { getTokenByTokenName } from "../move-agent-kit-main/src/utils/get-pool-address-by-token-name"
-
+} from "./tools/thala"
+import { getTokenByTokenName } from "./utils/get-pool-address-by-token-name"
+import { coinGeckoTool } from "./tools/coingecko";
 export class AgentRuntime {
 	public account: BaseSigner
 	public aptos: Aptos
@@ -296,4 +296,27 @@ export class AgentRuntime {
 	getPositionsWithMerkleTrade() {
 		return getPositionsWithMerkleTrade(this)
 	}
+
+	// Add this method to your AgentRuntime class
+	async getTokenContractAddress(tokenName: string) {
+		// The coinGeckoTool.func returns a Promise<string> with a JSON string
+		const resultJson = await coinGeckoTool.func({ tokenName });
+		// Parse the JSON string to get the actual data
+		const result = JSON.parse(resultJson);
+		
+		if (result.success) {
+		// If it's a single token, return the address
+		if (result.address) {
+			return result.address;
+		} 
+		// If it's multiple tokens, return the first one's address
+		else if (result.tokens && result.tokens.length > 0) {
+			return result.tokens[0].address;
+		}
+		}
+		
+		// Return null or throw an error if no token found
+		return null;
+	}
+
 }
