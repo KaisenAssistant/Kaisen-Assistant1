@@ -9,7 +9,6 @@ import { NextResponse } from "next/server"
 import { DynamicStructuredTool } from "@langchain/core/tools"
 import { z } from "zod"
 
-// Import the LLMTradingAnalyzer
 import LLMTradingAnalyzer from "@/tools/twitter/llm-analyzer"
 
 
@@ -31,24 +30,78 @@ function createTradingAnalyzerTool(analyzer: LLMTradingAnalyzer) {
 			totalTweets: z.number().optional().describe("Total number of tweets analyzed"),
 			totalCryptoTweets: z.number().optional().describe("Number of crypto-related tweets"),
 			positiveCount: z.number().optional().describe("Number of potentially positive tweets"),
-			hashtags: z.array(z.string()).optional().describe("Top hashtags found in the tweets")
+			negativeCount: z.number().optional().describe("Number of potentially negative tweets"),
+			neutralCount: z.number().optional().describe("Number of neutral tweets"),
+			hashtags: z.array(z.string()).optional().describe("Top hashtags found in the tweets"),
+			influencers: z.array(z.string()).optional().describe("Influential accounts discussing the topic"),
+			sampleTweets: z.array(z.string()).optional().describe("Sample tweets for analysis"),
+			confidenceThreshold: z.number().optional().describe("Confidence threshold for recommendations")
 		}),
-		func: async ({ cryptoSymbol, query, totalTweets, totalCryptoTweets, positiveCount, hashtags = ["#crypto"] }) => {
-			// Create a ScraperResult object from the inputs with default values
-			const scraperResult = {
-				query,
-				// The AND is not going to get trigger due to generation in TradingAnalyzerTool.ts
-				totalTweets: totalTweets ?? 2000, // Default to 5000 if undefined
-				analysis: {
-					totalCryptoTweets: totalCryptoTweets ?? 1800, // Default to 1800 if undefined
-					potentiallyPositiveTweets: positiveCount ?? 1000, // Default to 1000 if undefined
-					topHashtags: hashtags
-				}
+		func: async ({
+						 cryptoSymbol,
+						 query,
+						 totalTweets = 2000,
+						 totalCryptoTweets,
+						 positiveCount,
+						 negativeCount,
+						 neutralCount,
+						 hashtags = ["#crypto"],
+						 influencers = [],
+						 sampleTweets = [],
+						 confidenceThreshold
+					 }) => {
+			// Calculate derived values
+			const actualTotalCryptoTweets = totalCryptoTweets ?? Math.floor(totalTweets * 0.9);
+			const actualPositiveCount = positiveCount ?? Math.floor(actualTotalCryptoTweets * 0.5);
+			const actualNegativeCount = negativeCount ?? Math.floor(actualTotalCryptoTweets * 0.3); //
+			const actualNeutralCount = neutralCount ??
+				(actualTotalCryptoTweets - actualPositiveCount - (actualNegativeCount ?? 0));
+
+			// Generate sentiment trend
+			let sentimentTrend: "RISING" | "FALLING" | "STABLE";
+			if (actualPositiveCount > actualNegativeCount * 1.5) {
+				sentimentTrend = "RISING";
+			} else if (actualNegativeCount > actualPositiveCount * 1.2) {
+				sentimentTrend = "FALLING";
+			} else {
+				sentimentTrend = "STABLE";
+			}
+
+
+			const currentPrice = Math.random() * 1000 + 100;
+			const priceData = {
+				current: currentPrice,
+				yesterday: currentPrice * (1 - (Math.random() * 0.05 - 0.025)),
+				weekAgo: currentPrice * (1 - (Math.random() * 0.15 - 0.075)),
+				percentChange24h: Math.round((Math.random() * 10 - 5) * 10) / 10,
+				percentChange7d: Math.round((Math.random() * 20 - 10) * 10) / 10
 			};
 
 
-			// Use the analyzer to get a recommendation
-			const recommendation = await analyzer.analyzeTradingDecision(scraperResult, cryptoSymbol);
+			const scraperResult = {
+				query,
+				totalTweets,
+				sampleTweets,
+				timestamp: Date.now(), // Current timestamp for freshness validation
+				analysis: {
+					totalCryptoTweets: actualTotalCryptoTweets,
+					potentiallyPositiveTweets: actualPositiveCount,
+					potentiallyNegativeTweets: actualNegativeCount,
+					neutralTweets: actualNeutralCount,
+					topHashtags: hashtags,
+					influentialAccounts: influencers,
+					sentimentTrend
+				},
+				priceData
+			};
+
+
+			const recommendation = await analyzer.analyzeTradingDecision(
+				scraperResult,
+				cryptoSymbol,
+				undefined,
+				confidenceThreshold
+			);
 
 			// Return the recommendation as a formatted string
 			return JSON.stringify(recommendation, null, 2);
@@ -59,25 +112,24 @@ function createTradingAnalyzerTool(analyzer: LLMTradingAnalyzer) {
 // Function to read and process the stream
 async function readStream(stream: any) {
 	try {
-		// Create a reader from the stream
+
 		const reader = stream.getReader()
 
 		let result = ""
 
 		while (true) {
-			// Read each chunk from the stream
+
 			const { done, value } = await reader.read()
 
-			// If the stream is finished, break the loop
 			if (done) {
 				break
 			}
 
-			// Decode the chunk and append to result
+
 			result += textDecoder.decode(value, { stream: true })
 		}
 
-		// Final decode to handle any remaining bytes
+
 		result += textDecoder.decode()
 
 		return result
@@ -113,20 +165,20 @@ const convertLangChainMessageToVercelMessage = (message: BaseMessage) => {
 
 export async function POST(request: Request) {
 	try {
-		// Initialize Aptos configuration
+
 		const aptosConfig = new AptosConfig({
 			network: Network.TESTNET,
 		})
 
 		const aptos = new Aptos(aptosConfig)
 
-		// Validate and get private key from environment
+
 		const privateKeyStr = process.env.APTOS_PRIVATE_KEY
 		if (!privateKeyStr) {
 			throw new Error("Missing APTOS_PRIVATE_KEY environment variable")
 		}
 
-		// Setup account and signer
+
 		const account = await aptos.deriveAccountFromPrivateKey({
 			privateKey: new Ed25519PrivateKey(PrivateKey.formatPrivateKey(privateKeyStr, PrivateKeyVariants.Ed25519)),
 		})
@@ -136,7 +188,7 @@ export async function POST(request: Request) {
 			PANORA_API_KEY: process.env.PANORA_API_KEY,
 		})
 
-		// Initialize the LLM
+
 		// @ts-ignore
 		const llm = await new ChatOpenAI({
 			modelName: "google/gemini-2.0-flash-001",
@@ -147,25 +199,24 @@ export async function POST(request: Request) {
 			streaming: true,
 		})
 
-		// Initialize the Trading Analyzer
+
 		const tradingAnalyzer = new LLMTradingAnalyzer(
 			OPENROUTER_API_KEY || "",
-			"https://yourwebsite.com", // Your site URL for OpenRouter analytics
-			"Crypto Trading Assistant" // Your app name for OpenRouter analytics
+			"https://yourwebsite.com",
+			"Crypto Trading Assistant"
 		)
 
-		// Get the Aptos tools
+
 		const aptosTools = createAptosTools(aptosAgent)
 
-		// Create the trading analyzer tool
+
 		const tradingAnalyzerTool = createTradingAnalyzerTool(tradingAnalyzer)
 
-		// Combine all tools
 		const allTools = [...aptosTools, tradingAnalyzerTool]
 
 		const memory = new MemorySaver()
 
-		// Create React agent with combined tools
+
 		const agent = createReactAgent({
 			llm,
 			tools: allTools,
@@ -239,11 +290,7 @@ export async function POST(request: Request) {
 
 			return new Response(transformStream)
 		} else {
-			/**
-			 * We could also pick intermediate steps out from `streamEvents` chunks, but
-			 * they are generated as JSON objects, so streaming and displaying them with
-			 * the AI SDK is more complicated.
-			 */
+
 			const result = await agent.invoke({ messages })
 
 			console.log("result", result)

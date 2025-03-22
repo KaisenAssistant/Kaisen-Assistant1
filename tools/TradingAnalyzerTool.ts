@@ -12,33 +12,87 @@ export function createTradingAnalyzerTool(analyzer: LLMTradingAnalyzer) {
             totalTweets: z.number().optional().describe("Total number of tweets analyzed"),
             totalCryptoTweets: z.number().optional().describe("Number of crypto-related tweets"),
             positiveCount: z.number().optional().describe("Number of potentially positive tweets"),
-            hashtags: z.array(z.string()).optional().describe("Top hashtags found in the tweets")
+            negativeCount: z.number().optional().describe("Number of potentially negative tweets"),
+            neutralCount: z.number().optional().describe("Number of neutral tweets"),
+            hashtags: z.array(z.string()).optional().describe("Top hashtags found in the tweets"),
+            influencers: z.array(z.string()).optional().describe("Influential accounts discussing the topic"),
+            sampleTweets: z.array(z.string()).optional().describe("Sample tweets for analysis"),
+            priceData: z.object({
+                current: z.number(),
+                yesterday: z.number(),
+                weekAgo: z.number(),
+                percentChange24h: z.number(),
+                percentChange7d: z.number()
+            }).optional().describe("Price data for the cryptocurrency"),
+            confidenceThreshold: z.number().optional().describe("Confidence threshold for recommendations")
         }),
-        func: async ({ cryptoSymbol, query, totalTweets, totalCryptoTweets, positiveCount, hashtags = ["#crypto"] }) => {
-            // Calculate dynamic values based on input or generate them if not provided by the user
-            const actualTotalTweets = totalTweets || Math.floor(Math.random() * 5000) + 3000;
-
-            // Make totalCryptoTweets a percentage of total tweets if not provided
+        func: async ({
+                         cryptoSymbol,
+                         query,
+                         totalTweets = 1000,
+                         totalCryptoTweets,
+                         positiveCount,
+                         negativeCount,
+                         neutralCount,
+                         hashtags = ["#crypto"],
+                         influencers = [],
+                         sampleTweets = [],
+                         priceData,
+                         confidenceThreshold
+                     }) => {
             const actualTotalCryptoTweets = totalCryptoTweets ||
-                Math.floor(actualTotalTweets * (Math.random() * 0.3 + 0.1));
+                Math.floor(totalTweets * (Math.random() * 0.3 + 0.1));
 
-            // Make positiveCount a percentage of crypto tweets if not provided
             const actualPositiveCount = positiveCount ||
-                Math.floor(actualTotalCryptoTweets * (Math.random() * 0.7 + 0.2));
+                Math.floor(actualTotalCryptoTweets * (Math.random() * 0.4 + 0.2));
+            const actualNegativeCount = negativeCount ||
+                Math.floor(actualTotalCryptoTweets * (Math.random() * 0.3 + 0.1));
+            const actualNeutralCount = neutralCount ||
+                (actualTotalCryptoTweets - actualPositiveCount - actualNegativeCount);
 
-            // ScraperResult object from the inputs
+
+            let sentimentTrend: "RISING" | "FALLING" | "STABLE";
+            if (actualPositiveCount > actualNegativeCount * 1.5) {
+                sentimentTrend = "RISING";
+            } else if (actualNegativeCount > actualPositiveCount * 1.5) {
+                sentimentTrend = "FALLING";
+            } else {
+                sentimentTrend = "STABLE";
+            }
+
+            const processedPriceData = priceData ? {
+                current: priceData.current,
+                yesterday: priceData.yesterday ?? (priceData.current * (1 - (Math.random() * 0.05 - 0.025))),
+                weekAgo: priceData.weekAgo ?? (priceData.current * (1 - (Math.random() * 0.15 - 0.075))),
+                percentChange24h: priceData.percentChange24h,
+                percentChange7d: priceData.percentChange7d
+            } : undefined;
+
+
             const scraperResult = {
                 query,
-                totalTweets: actualTotalTweets,
+                totalTweets,
+                sampleTweets,
+                timestamp: Date.now(),
                 analysis: {
                     totalCryptoTweets: actualTotalCryptoTweets,
                     potentiallyPositiveTweets: actualPositiveCount,
-                    topHashtags: hashtags
-                }
+                    potentiallyNegativeTweets: actualNegativeCount,
+                    neutralTweets: actualNeutralCount,
+                    topHashtags: hashtags,
+                    influentialAccounts: influencers,
+                    sentimentTrend
+                },
+                priceData: processedPriceData
             };
 
-            // analyzer to get a recommendation
-            const recommendation = await analyzer.analyzeTradingDecision(scraperResult, cryptoSymbol);
+            // Call analyzer to get a recommendation with optional confidence threshold
+            const recommendation = await analyzer.analyzeTradingDecision(
+                scraperResult,
+                cryptoSymbol,
+                undefined,
+                confidenceThreshold
+            );
 
             // Return the recommendation as a formatted string
             return JSON.stringify(recommendation, null, 2);
