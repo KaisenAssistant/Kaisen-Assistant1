@@ -1,7 +1,7 @@
 import { convertAmountFromHumanReadableToOnChain } from "@aptos-labs/ts-sdk"
 import { Tool } from "langchain/tools"
-import type { AgentRuntime } from "../../../../chat-agent/agent"
-import { parseJson } from "../../utils"
+import type { AgentRuntime } from "../../agent"
+import { parseJson } from "@/utils"
 
 export class AriesBorrowTool extends Tool {
 	name = "aries_borrow"

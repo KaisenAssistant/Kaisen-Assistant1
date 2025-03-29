@@ -1,6 +1,6 @@
 import { convertAmountFromHumanReadableToOnChain } from "@aptos-labs/ts-sdk"
 import { Tool } from "langchain/tools"
-import type { AgentRuntime } from "../../../../chat-agent/agent"
+import type { AgentRuntime } from "@/agent"
 import { parseJson } from "../../utils"
 export class ThalaUnstakeTokenTool extends Tool {
 	name = "thala_unstake_token"

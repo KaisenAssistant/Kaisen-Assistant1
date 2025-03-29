@@ -1,5 +1,5 @@
 import { Tool } from "langchain/tools"
-import type { AgentRuntime } from "../../../../chat-agent/agent"
+import type { AgentRuntime } from "@/agent"
 
 export class MerkleTradeGetPositionTool extends Tool {
 	name = "merkle_trade_get_position"
