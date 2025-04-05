@@ -18,11 +18,11 @@ export function IntermediateStep(props: { message: Message }) {
 					boxShadow: '0 2px 12px rgba(52, 199, 89, 0.15)',
 				}}
 			>
-				<div 
-					className={`flex items-center gap-3 cursor-pointer ${expanded ? "mb-4" : ""}`} 
+				<div
+					className={`flex items-center gap-3 cursor-pointer ${expanded ? "mb-4" : ""}`}
 					onClick={(e) => setExpanded(!expanded)}
 				>
-					<div 
+					<div
 						className="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-full text-base shadow-md"
 						style={{
 							background: 'linear-gradient(135deg, var(--success), #26A65B)',
@@ -41,10 +41,10 @@ export function IntermediateStep(props: { message: Message }) {
 						style={{ backgroundColor: 'rgba(255, 255, 255, 0.05)' }}
 						aria-label={expanded ? 'Collapse details' : 'Expand details'}
 					>
-						{expanded ? 
+						{expanded ?
 							<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
 								<polyline points="18 15 12 9 6 15"></polyline>
-							</svg> : 
+							</svg> :
 							<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
 								<polyline points="6 9 12 15 18 9"></polyline>
 							</svg>
@@ -57,7 +57,7 @@ export function IntermediateStep(props: { message: Message }) {
 					}`}
 				>
 					<div className="space-y-3">
-						<div 
+						<div
 							className="rounded-lg p-3 border border-[#2A2F3C]"
 							style={{
 								backgroundColor: 'var(--background-primary)',
@@ -69,14 +69,14 @@ export function IntermediateStep(props: { message: Message }) {
 								</svg>
 								Tool Input:
 							</div>
-							<code 
+							<code
 								className="text-sm block whitespace-pre-wrap"
 								style={{ color: 'var(--text-primary)' }}
 							>
 								{JSON.stringify(action.args, null, 2)}
 							</code>
 						</div>
-						<div 
+						<div
 							className="rounded-lg p-3 border border-[#2A2F3C]"
 							style={{
 								backgroundColor: 'var(--background-primary)',
@@ -89,7 +89,7 @@ export function IntermediateStep(props: { message: Message }) {
 								</svg>
 								Observation:
 							</div>
-							<code 
+							<code
 								className="text-sm block whitespace-pre-wrap"
 								style={{ color: 'var(--text-primary)' }}
 							>

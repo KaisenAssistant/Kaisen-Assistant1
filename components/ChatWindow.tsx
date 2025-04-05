@@ -161,18 +161,18 @@ export function ChatWindow(props: {
 
 	return (
 		<div className="flex flex-col w-full max-w-5xl mx-auto h-[calc(100vh-2rem)] my-4">
-			<header className="flex items-center justify-between px-6 py-4 border-b backdrop-blur-sm bg-opacity-90" 
-				style={{ 
-					borderColor: 'var(--border-light)',
-					background: 'linear-gradient(to right, var(--background-primary), var(--background-secondary))'
-				}}
+			<header className="flex items-center justify-between px-6 py-4 border-b backdrop-blur-sm bg-opacity-90"
+					style={{
+						borderColor: 'var(--border-light)',
+						background: 'linear-gradient(to right, var(--background-primary), var(--background-secondary))'
+					}}
 			>
 				<div className="flex items-center gap-3">
-					<div className="w-9 h-9 rounded-full flex items-center justify-center" 
-						style={{ 
-							background: 'linear-gradient(135deg, var(--accent-primary), var(--accent-hover))',
-							boxShadow: '0 2px 8px rgba(104, 71, 255, 0.25)'
-						}}
+					<div className="w-9 h-9 rounded-full flex items-center justify-center"
+						 style={{
+							 background: 'linear-gradient(135deg, var(--accent-primary), var(--accent-hover))',
+							 boxShadow: '0 2px 8px rgba(104, 71, 255, 0.25)'
+						 }}
 					>
 						<span className="text-xl">{emoji}</span>
 					</div>
@@ -187,8 +187,8 @@ export function ChatWindow(props: {
 					</div>
 				) : (
 					<div className="space-y-6">
-						{[...messages].reverse().map((m, i) => {
-							const sourceKey = (messages.length - 1 - i).toString()
+						{messages.map((m, i) => {
+							const sourceKey = i.toString()
 							return m.role === "system" ? (
 								<IntermediateStep key={m.id} message={m} />
 							) : (
@@ -204,11 +204,11 @@ export function ChatWindow(props: {
 				)}
 			</main>
 
-			<footer className="border-t p-6" 
-				style={{ 
-					borderColor: 'var(--border-light)',
-					background: 'linear-gradient(to right, var(--background-primary), var(--background-secondary))'
-				}}
+			<footer className="border-t p-6"
+					style={{
+						borderColor: 'var(--border-light)',
+						background: 'linear-gradient(to right, var(--background-primary), var(--background-secondary))'
+					}}
 			>
 				{intemediateStepsToggle && (
 					<div className="mb-4 flex items-center gap-2">
@@ -221,8 +221,8 @@ export function ChatWindow(props: {
 							className="w-4 h-4 rounded border-2 text-accent-primary focus:ring-accent-primary"
 							style={{ borderColor: 'var(--text-secondary)' }}
 						/>
-						<label 
-							htmlFor="show_intermediate_steps" 
+						<label
+							htmlFor="show_intermediate_steps"
 							className="text-sm"
 							style={{ color: 'var(--text-secondary)' }}
 						>
@@ -263,7 +263,7 @@ export function ChatWindow(props: {
 						type="submit"
 						disabled={chatEndpointIsLoading || intermediateStepsLoading || !input.trim()}
 						className="px-4 py-2 rounded-lg font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed hover:opacity-90 flex items-center justify-center min-w-[100px]"
-						style={{ 
+						style={{
 							background: 'linear-gradient(135deg, var(--accent-primary), var(--accent-hover))',
 							color: 'white',
 							boxShadow: '0 2px 8px rgba(104, 71, 255, 0.25)'

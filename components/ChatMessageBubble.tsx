@@ -32,8 +32,8 @@ export function ChatMessageBubble(props: { message: Message; aiEmoji?: string; s
 				<div
 					className="w-8 h-8 rounded-full flex items-center justify-center text-lg shadow-md flex-shrink-0"
 					style={{
-						background: message.role === "user" 
-							? "linear-gradient(135deg, #3F51B5, #2196F3)" 
+						background: message.role === "user"
+							? "linear-gradient(135deg, #3F51B5, #2196F3)"
 							: "linear-gradient(135deg, var(--accent-primary), var(--accent-hover))",
 						color: "white",
 					}}
@@ -84,7 +84,7 @@ export function ChatMessageBubble(props: { message: Message; aiEmoji?: string; s
 										const { children, className } = props
 										const match = /language-(\w+)/.exec(className || "")
 										const language = match ? match[1] : "text"
-										
+
 										if (className) {
 											return (
 												<SyntaxHighlighter
