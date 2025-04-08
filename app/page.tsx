@@ -20,7 +20,7 @@ export default function Home() {
           </h3>
         </div>
         <h2 className="text-6xl font-medium text-white">How can I help you?</h2>
-        <p className="text-2xl font-medium text-[#747474]">
+        <p className="text-2xl my-4 font-medium text-[#747474]">
           It all starts with a question. Ask anything from prices to trading
           strategies. Kaisen turns your words into DeFi action.
         </p>
@@ -28,13 +28,25 @@ export default function Home() {
 
       {/* Suggested Questions */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-        <button className="p-3 bg-gradient-to-b from-[#2B2B2B] via-[#151515] to-[#202020] rounded-lg border border-[#2A2F3C] text-[#E8EAED] hover:bg-[#2A2F3C] transition-colors">
+        <button className="p-3 rounded-lg border border-[#2A2F3C] text-[#E8EAED] hover:bg-[#2A2F3C] transition-colors"
+		style={{
+			background: "linear-gradient(135deg, #2B2B2B, #151515, #202020)",
+			}}		
+		>
           What's the current price of $BTC and $APT?
         </button>
-        <button className="p-3 bg-gradient-to-b from-[#2B2B2B] via-[#151515] to-[#202020] rounded-lg border border-[#2A2F3C] text-[#E8EAED] hover:bg-[#2A2F3C] transition-colors">
+        <button className="p-3 rounded-lg border border-[#2A2F3C] text-[#E8EAED] hover:bg-[#2A2F3C] transition-colors"
+		style={{
+			background: "linear-gradient(135deg, #2B2B2B, #151515, #202020)",
+			}}		
+		>
           Show me the top 5 gainers on Aptos today
         </button>
-        <button className="p-3 bg-gradient-to-b from-[#2B2B2B] via-[#151515] to-[#202020] rounded-lg border border-[#2A2F3C] text-[#E8EAED] hover:bg-[#2A2F3C] transition-colors">
+        <button className="p-3 rounded-lg border border-[#2A2F3C] text-[#E8EAED] hover:bg-[#2A2F3C] transition-colors"
+			style={{
+				background: "linear-gradient(135deg, #2B2B2B, #151515, #202020)",
+				}}		
+		>
           Any trending tokens I should watch?
         </button>
       </div>
