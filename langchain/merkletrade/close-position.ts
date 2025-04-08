@@ -1,6 +1,6 @@
 import { Tool } from "langchain/tools"
 import type { AgentRuntime } from "@/agent"
-import { parseJson } from "../../utils"
+import { parseJson } from "@/utils"
 
 export class MerkleTradeClosePositionTool extends Tool {
 	name = "merkle_trade_close_position"
