@@ -102,14 +102,14 @@ flowchart TD
 ## Getting Started
 ```bash
 # Install dependencies
-npm install
+pnpm install
 
 # Configure your API keys
-cp .env.example .env
+cp .example.env .env
 # Edit .env with your API keys for Joule Protocol, Panora, Twitter, and CoinGecko
 
 # Start the assistant
-npm run dev
+pnpm run dev
 ```
 
 ## Usage Examples

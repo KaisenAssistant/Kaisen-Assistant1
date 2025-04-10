@@ -18,8 +18,8 @@ interface ChatWindowProps {
   titleText?: string;
   emoji?: string;
   showIntermediateStepsToggle?: boolean;
-  suggestedQuestion?: string | null; // New prop for suggested question
-  onQuestionSubmitted?: () => void; // Callback to reset question
+  suggestedQuestion?: string | null;
+  onQuestionSubmitted?: () => void;
 }
 
 export const ChatWindow: React.FC<ChatWindowProps> = ({
@@ -81,6 +81,15 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
   const [showIntermediateSteps, setShowIntermediateSteps] = useState<boolean>(false);
   const [intermediateStepsLoading, setIntermediateStepsLoading] = useState<boolean>(false);
   const [sourcesForMessages, setSourcesForMessages] = useState<Record<string, any>>({});
+
+  const messagesEndRef = useRef<HTMLDivElement | null>(null);
+
+  // Scroll to top when messages change
+  useEffect(() => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [messages]);
 
   const sendMessage = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
@@ -158,11 +167,10 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
       }
     }
     if (onQuestionSubmitted) {
-      onQuestionSubmitted(); // Reset suggested question after submission
+      onQuestionSubmitted();
     }
   };
 
-  // Handle suggested question submission
   useEffect(() => {
     if (suggestedQuestion) {
       setInput(suggestedQuestion);
@@ -226,6 +234,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
                 />
               );
             })}
+            <div ref={messagesEndRef} /> {/* Invisible anchor for scrolling */}
           </div>
         )}
       </main>

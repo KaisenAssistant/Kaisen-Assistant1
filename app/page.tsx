@@ -12,9 +12,15 @@ export default function Home() {
 
   // State to control the input and submission in ChatWindow
   const [questionToSubmit, setQuestionToSubmit] = useState<string | null>(null);
+  // State to trigger InfoCard refresh
+  const [refreshKey, setRefreshKey] = useState(0);
 
   const handleQuestionClick = useCallback((question: string) => {
-    setQuestionToSubmit(question); // Trigger submission in ChatWindow
+    setQuestionToSubmit(question);
+  }, []);
+
+  const handleNewChatClick = useCallback(() => {
+    setRefreshKey((prev) => prev + 1); // Increment to force InfoCard re-render
   }, []);
 
   const InfoCard: React.ReactElement = (
@@ -71,6 +77,7 @@ export default function Home() {
           <img src="/kaisen_logo_chat_window.svg" alt="kaisen-logo-ChatHistory" />
         </div>
         <button
+          onClick={handleNewChatClick}
           className="w-full mb-4 p-2 text-white rounded-[9.54px] text-base transition-colors hover:bg-[#5A3FE6]"
           style={{
             background: "linear-gradient(135deg, #8F59E2, #7321EB, #7E45D6)",
@@ -91,9 +98,10 @@ export default function Home() {
           emoji="🤖"
           titleText="KAISEN ASSISTANT"
           placeholder="Ask about crypto trends and Twitter analysis..."
-          emptyStateComponent={InfoCard}
-          suggestedQuestion={questionToSubmit} // Pass the question to submit
-          onQuestionSubmitted={() => setQuestionToSubmit(null)} // Reset after submission
+          emptyStateComponent={InfoCard} // pass the static InfoCard
+          suggestedQuestion={questionToSubmit}
+          onQuestionSubmitted={() => setQuestionToSubmit(null)}
+          key={refreshKey} // force re-render of ChatWindow when refreshKey changes
         />
       </main>
     </section>
