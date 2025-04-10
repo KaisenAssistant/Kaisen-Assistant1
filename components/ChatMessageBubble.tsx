@@ -30,7 +30,7 @@ export const ChatMessageBubble: React.FC<ChatMessageBubbleProps> = ({ message, a
           message.role === "user" ? "flex-row-reverse" : "flex-row"
         } items-start gap-4`}
       >
-        <div
+        {/* <div
           className="w-8 h-8 rounded-full flex items-center justify-center text-lg shadow-md flex-shrink-0"
           style={{
             background: message.role === "user"
@@ -40,11 +40,11 @@ export const ChatMessageBubble: React.FC<ChatMessageBubbleProps> = ({ message, a
           }}
         >
           <span>{message.role === "user" ? "👤" : aiEmoji || "₿"}</span>
-        </div>
+        </div> */}
 
         <div className="flex flex-col gap-2 w-full overflow-hidden">
           <div
-            className="prose w-full p-4 rounded-lg relative group backdrop-blur-sm break-words whitespace-pre-wrap"
+            className="prose w-full px-5 rounded-lg relative group backdrop-blur-sm break-words whitespace-pre-wrap"
             style={{
               background: message.role === "user" ? "linear-gradient(135deg, #8F59E2, #7321EB, #7E45D6)" : "linear-gradient(135deg, #222222, #111010, #161517)",
               color: "var(--text-primary)",
@@ -62,7 +62,7 @@ export const ChatMessageBubble: React.FC<ChatMessageBubbleProps> = ({ message, a
             {message.role === "assistant" && (
               <button
                 onClick={() => copyToClipboard(message.content)}
-                className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded-md hover:bg-black/10"
+                className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity  rounded-md hover:bg-black/10"
                 style={{ color: "var(--text-secondary)" }}
                 aria-label="Copy message"
               >
