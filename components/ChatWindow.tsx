@@ -236,9 +236,9 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
         <form
           onSubmit={sendMessage}
           ref={formRef}
-          className="flex px-4 py-1 opacity-60 bg-[#3C3C3C] rounded-full gap-4 w-[600px] items-center"
+          className="flex px-4 py-1 opacity-60 bg-[#3C3C3C] rounded-full gap-4 w-[600px] items-center max-[930px]:w-[500px] max-[768px]:w-[400px] max-[550px]:w-[300px]"
         >
-          <div className="flex-1 relative bg-transparent p-0">
+          <div className="flex-1 relative bg-transparent p-0 max-[768px]:text-xs max-[550px]:text-customSmall">
             <textarea
               ref={textareaRef}
               value={input}
