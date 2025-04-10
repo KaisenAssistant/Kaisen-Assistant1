@@ -172,6 +172,8 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
     }
   };
 
+  const formRef = useRef<HTMLFormElement>(null);
+
   return (
     <div className="flex flex-col w-full max-w-5xl mx-auto h-[calc(100vh-2rem)] items-center">
       <span className="flex justify-end self-end">
@@ -215,7 +217,10 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
       <footer className="p-6 bg-transparent">
         {intermediateStepsToggle && <div className="mb-4 flex items-center gap-2">{intermediateStepsToggle}</div>}
 
-        <form onSubmit={sendMessage} className="flex p-2 opacity-60 bg-[#3C3C3C] rounded-3xl gap-4 w-[600px] items-center">
+        <form 
+          onSubmit={sendMessage} 
+          ref={formRef}
+          className="flex px-4 py-1 opacity-60 bg-[#3C3C3C] rounded-full gap-4 w-[600px] items-center">
           <div className="flex-1 relative bg-transparent p-0">
             <textarea
               ref={textareaRef}
@@ -225,9 +230,27 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
                 e.target.style.height = "auto";
                 e.target.style.height = `${e.target.scrollHeight}px`;
               }}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && !e.shiftKey) {
+                  e.preventDefault(); // Prevent newline
+                  console.log("Enter pressed:", {
+                    input: input.trim(),
+                    chatEndpointIsLoading,
+                    intermediateStepsLoading,
+                  }); // Debug log
+                  if (input.trim() && !chatEndpointIsLoading && !intermediateStepsLoading) {
+                    // Create a synthetic FormEvent to pass to sendMessage
+                    const syntheticEvent = {
+                      preventDefault: () => {},
+                      currentTarget: formRef.current,
+                    } as FormEvent<HTMLFormElement>;
+                    sendMessage(syntheticEvent); // Call sendMessage directly
+                  }
+                }
+              }}
               placeholder={placeholder ?? "Message..."}
               rows={1}
-              className="w-full resize-none p-3 bg-transparent text-white max-h-[200px] outline-none"
+              className="w-full resize-none p-3 bg-transparent text-white max-h-[200px] outline-none focus:outline-none focus:ring-0"
             />
           </div>
           <button
@@ -235,9 +258,9 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
             disabled={chatEndpointIsLoading || intermediateStepsLoading || !input.trim()}
             className="px-4 py-2 rounded-3xl font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed hover:opacity-100 flex items-center justify-center min-w-[40px] opacity-80"
             style={{
-				background: "linear-gradient(135deg, #8F59E2, #7321EB, #7E45D6)",
-				boxShadow: "0px 0px 1rem 5px rgba(104, 71, 255, .5)",
-				color: "white",
+              background: "linear-gradient(135deg, #8F59E2, #7321EB, #7E45D6)",
+              boxShadow: "0px 0px 1rem 5px rgba(104, 71, 255, .5)",
+              color: "white",
             }}
           >
             {(chatEndpointIsLoading || intermediateStepsLoading) ? (
