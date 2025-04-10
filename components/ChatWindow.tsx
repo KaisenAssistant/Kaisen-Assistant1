@@ -18,6 +18,8 @@ interface ChatWindowProps {
   titleText?: string;
   emoji?: string;
   showIntermediateStepsToggle?: boolean;
+  suggestedQuestion?: string | null; // New prop for suggested question
+  onQuestionSubmitted?: () => void; // Callback to reset question
 }
 
 export const ChatWindow: React.FC<ChatWindowProps> = ({
@@ -27,14 +29,17 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
   titleText = "An LLM",
   showIntermediateStepsToggle,
   emoji,
+  suggestedQuestion,
+  onQuestionSubmitted,
 }) => {
   const messageContainerRef = useRef<HTMLDivElement | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
-  const walletAddress: string = "0x8fa1f6cbf61a6c80b12d8c..."; // here i added temp wallet address
+  const formRef = useRef<HTMLFormElement>(null);
+  const walletAddress: string = "0x8fa1f6cbf61a6c80b12d8c...";
 
   const {
     messages,
-    input,
+    input: rawInput,
     setInput,
     handleInputChange,
     handleSubmit,
@@ -63,7 +68,8 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
     },
   });
 
-  // Auto-resize textarea
+  const input = rawInput ?? "";
+
   useEffect(() => {
     const textarea = textareaRef.current;
     if (textarea) {
@@ -74,22 +80,6 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
 
   const [showIntermediateSteps, setShowIntermediateSteps] = useState<boolean>(false);
   const [intermediateStepsLoading, setIntermediateStepsLoading] = useState<boolean>(false);
-  const intermediateStepsToggle = showIntermediateStepsToggle && (
-    <div className="flex items-center gap-2 mb-4">
-      <input
-        type="checkbox"
-        id="show_intermediate_steps"
-        name="show_intermediate_steps"
-        checked={showIntermediateSteps}
-        onChange={(e) => setShowIntermediateSteps(e.target.checked)}
-        className="w-4 h-4 rounded border-2 border-gray-500 focus:ring-2 focus:ring-blue-500"
-      />
-      <label htmlFor="show_intermediate_steps" className="text-sm text-gray-400">
-        Show intermediate steps
-      </label>
-    </div>
-  );
-
   const [sourcesForMessages, setSourcesForMessages] = useState<Record<string, any>>({});
 
   const sendMessage = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
@@ -100,12 +90,11 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
     if (!messages.length) {
       await new Promise((resolve) => setTimeout(resolve, 300));
     }
-    if (chatEndpointIsLoading ?? intermediateStepsLoading) {
+    if (chatEndpointIsLoading || intermediateStepsLoading) {
       return;
     }
     if (!showIntermediateSteps) {
       handleSubmit(e);
-      // Some extra work to show intermediate steps properly
     } else {
       setIntermediateStepsLoading(true);
       setInput("");
@@ -126,8 +115,6 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
       setIntermediateStepsLoading(false);
       if (response.status === 200) {
         const responseMessages: Message[] = json.messages;
-        // Represent intermediate steps as system messages for display purposes
-        // TODO: Add proper support for tool messages
         const toolCallMessages = responseMessages.filter((responseMessage: Message) => {
           return (
             (responseMessage.role === "assistant" && !!responseMessage.tool_calls?.length) ||
@@ -170,9 +157,38 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
         }
       }
     }
+    if (onQuestionSubmitted) {
+      onQuestionSubmitted(); // Reset suggested question after submission
+    }
   };
 
-  const formRef = useRef<HTMLFormElement>(null);
+  // Handle suggested question submission
+  useEffect(() => {
+    if (suggestedQuestion) {
+      setInput(suggestedQuestion);
+      const syntheticEvent = {
+        preventDefault: () => {},
+        currentTarget: formRef.current,
+      } as FormEvent<HTMLFormElement>;
+      sendMessage(syntheticEvent);
+    }
+  }, [suggestedQuestion]);
+
+  const intermediateStepsToggle = showIntermediateStepsToggle && (
+    <div className="flex items-center gap-2 mb-4">
+      <input
+        type="checkbox"
+        id="show_intermediate_steps"
+        name="show_intermediate_steps"
+        checked={showIntermediateSteps}
+        onChange={(e) => setShowIntermediateSteps(e.target.checked)}
+        className="w-4 h-4 rounded border-2 border-gray-500 focus:ring-2 focus:ring-blue-500"
+      />
+      <label htmlFor="show_intermediate_steps" className="text-sm text-gray-400">
+        Show intermediate steps
+      </label>
+    </div>
+  );
 
   return (
     <div className="flex flex-col w-full max-w-5xl mx-auto h-[calc(100vh-2rem)] items-center">
@@ -217,10 +233,11 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
       <footer className="p-6 bg-transparent">
         {intermediateStepsToggle && <div className="mb-4 flex items-center gap-2">{intermediateStepsToggle}</div>}
 
-        <form 
-          onSubmit={sendMessage} 
+        <form
+          onSubmit={sendMessage}
           ref={formRef}
-          className="flex px-4 py-1 opacity-60 bg-[#3C3C3C] rounded-full gap-4 w-[600px] items-center">
+          className="flex px-4 py-1 opacity-60 bg-[#3C3C3C] rounded-full gap-4 w-[600px] items-center"
+        >
           <div className="flex-1 relative bg-transparent p-0">
             <textarea
               ref={textareaRef}
@@ -232,19 +249,13 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
               }}
               onKeyDown={(e) => {
                 if (e.key === "Enter" && !e.shiftKey) {
-                  e.preventDefault(); // Prevent newline
-                  console.log("Enter pressed:", {
-                    input: input.trim(),
-                    chatEndpointIsLoading,
-                    intermediateStepsLoading,
-                  }); // Debug log
+                  e.preventDefault();
                   if (input.trim() && !chatEndpointIsLoading && !intermediateStepsLoading) {
-                    // Create a synthetic FormEvent to pass to sendMessage
                     const syntheticEvent = {
                       preventDefault: () => {},
                       currentTarget: formRef.current,
                     } as FormEvent<HTMLFormElement>;
-                    sendMessage(syntheticEvent); // Call sendMessage directly
+                    sendMessage(syntheticEvent);
                   }
                 }
               }}
