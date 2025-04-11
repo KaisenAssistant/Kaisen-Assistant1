@@ -175,6 +175,16 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
   const [intermediateStepsLoading, setIntermediateStepsLoading] = useState<boolean>(false);
   const [sourcesForMessages, setSourcesForMessages] = useState<Record<string, any>>({});
 
+  // scrolls to latest message
+  useEffect(() => {
+    if (messageContainerRef.current) {
+      messageContainerRef.current.scrollTo({
+        top: messageContainerRef.current.scrollHeight,
+        behavior: "smooth",
+      });
+    }
+  }, [messages]);
+
   const sendMessage = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
     if (messageContainerRef.current) {
@@ -310,7 +320,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
         <div className="relative flex flex-col h-full max-w-5xl w-full bg-transparent overflow-hidden">
           {!isAtTop && (
             <div
-              className={`pointer-events-none absolute top-0 left-0 w-full h-10 z-10 transition-opacity duration-500 ${
+              className={`pointer-events-none absolute top-0 left-0 w-full h-2 z-10 transition-opacity duration-500 ${
                 isAtTop ? "opacity-0" : "opacity-100"
               }`}
               style={{
@@ -323,7 +333,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
 
           {!isAtBottom && (
             <div
-              className={`pointer-events-none absolute bottom-0 left-0 w-full h-10 z-10 transition-opacity duration-500 ${
+              className={`pointer-events-none absolute bottom-0 left-0 w-full h-2 z-10 transition-opacity duration-500 ${
                 isAtBottom ? "opacity-0" : "opacity-100"
               }`}
               style={{
