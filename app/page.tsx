@@ -87,8 +87,13 @@ const ConnectWalletButton = () => {
                 onClick={walletAddress ? handleDisconnect : handleConnect}
                 className="mt-10 px-12 py-3 text-2xl font-medium rounded-lg bg-gradient-to-r from-[#7B61FF] to-[#BA4EFF] hover:opacity-90 transition"
                 disabled={isConnecting}
-            >
 
+            >
+                {isConnecting
+                    ? "Connecting..."
+                    : walletAddress
+                        ? "Disconnect Wallet"
+                        : "Connect to Wallet"}
             </button>
             {walletAddress && (
                 <div className="text-sm text-gray-300 mt-2">
