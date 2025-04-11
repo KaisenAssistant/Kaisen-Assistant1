@@ -1,6 +1,5 @@
-import type { Metadata } from "next"
-import { Space_Grotesk } from "next/font/google"
-import "./globals.css"
+import type { Metadata } from "next";
+import { Space_Grotesk } from "next/font/google";
 
 const spaceGrotesk = Space_Grotesk({
 	variable: "--font-space-grotesk",

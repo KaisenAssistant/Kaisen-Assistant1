@@ -4,6 +4,7 @@ import Image from "next/image";
 import pattern from "../public/bg-pattern.svg";
 import gradient from "../public/purple-gradient.svg";
 import composition from "../public/purple-composition.svg";
+
 import { PropsWithChildren, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 
