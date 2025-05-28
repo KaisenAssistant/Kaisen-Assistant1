@@ -3,7 +3,7 @@
 ## Overview
 Kaisen-Assistant is an advanced multi-agent system designed to handle specialized tasks across blockchain operations, trading analysis, and general queries. Powered by sophisticated natural language processing, the platform leverages a comprehensive suite of blockchain tools including Joule Protocol for DeFi operations, Panora for cross-chain trading, Twitter sentiment analysis for market intelligence without API dependencies, and CoinGecko integration for Aptos-chain token verification. The system utilizes a manager-agent architecture to intelligently route user queries to the appropriate specialized agent based on intent recognition, ensuring efficient and accurate responses while maintaining seamless context across complex blockchain interactions.
 
-## Live Demo 
+## Live Demo
 Try Kaisen-Assistant now: [Live Demo](https://twitter-move.vercel.app/)
 
 ## Architecture
@@ -102,14 +102,14 @@ flowchart TD
 ## Getting Started
 ```bash
 # Install dependencies
-pnpm install
+npm install
 
 # Configure your API keys
-cp .example.env .env
+cp .env.example .env
 # Edit .env with your API keys for Joule Protocol, Panora, Twitter, and CoinGecko
 
 # Start the assistant
-pnpm run dev
+npm run dev
 ```
 
 ## Usage Examples
@@ -183,6 +183,31 @@ Kaisen-Assistant can be configured through the `config.json` file:
   }
 }
 ```
+
+## Testing
+To run the test suite for Kaisen-Assistant:
+
+```bash
+# Run all tests
+npm test
+
+# Run tests with coverage report
+npm run test:coverage
+
+# Run specific test file
+npm test -- path/to/test/file.test.ts
+
+# Run tests in watch mode during development
+npm run test:watch
+```
+
+The test suite includes:
+- Unit tests for individual components
+- Integration tests for tool interactions
+- End-to-end tests for complete workflows
+- Performance tests for response time optimization
+
+Test files are located in the `__tests__` directory and follow the naming pattern `*.test.ts`.
 
 ## Contributing
 1. Fork the repository
