@@ -136,7 +136,7 @@ const ChatPageContent = () => {
     );
 
     return (
-        <section className="flex h-screen bg-[url('/kaisen-background.svg')] bg-cover bg-no-repeat bg-center">
+        <section className="flex h-screen">
             <aside className="w-1/4 bg-[#121212] p-4 overflow-y-auto border-r border-[#2A2F3C] opacity-70">
                 <div className="flex flex-col items-center mb-12">
                     <img
