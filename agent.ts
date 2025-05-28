@@ -62,6 +62,7 @@ export class AgentRuntime {
 	public account: BaseSigner
 	public aptos: Aptos
 	public config: any
+	private tokenAddressCache: Map<string, string> = new Map()
 
 	constructor(account: BaseSigner, aptos: Aptos, config?: any) {
 		this.account = account
@@ -299,22 +300,36 @@ export class AgentRuntime {
 
 	// Add this method to your AgentRuntime class
 	async getTokenContractAddress(tokenName: string) {
+		// Check cache first
+		const cachedAddress = this.tokenAddressCache.get(tokenName.toLowerCase());
+		if (cachedAddress) {
+			return cachedAddress;
+		}
+
 		// The coinGeckoTool.func returns a Promise<string> with a JSON string
 		const resultJson = await coinGeckoTool.func({ tokenName });
 		// Parse the JSON string to get the actual data
 		const result = JSON.parse(resultJson);
-		
+
 		if (result.success) {
-		// If it's a single token, return the address
-		if (result.address) {
-			return result.address;
-		} 
-		// If it's multiple tokens, return the first one's address
-		else if (result.tokens && result.tokens.length > 0) {
-			return result.tokens[0].address;
+			let address = null;
+			// If it's a single token, return the address
+			if (result.address) {
+				address = result.address;
+			}
+			// If it's multiple tokens, return the first one's address
+			else if (result.tokens && result.tokens.length > 0) {
+				address = result.tokens[0].address;
+			}
+
+			// Cache the result if we found an address
+			if (address) {
+				this.tokenAddressCache.set(tokenName.toLowerCase(), address);
+			}
+
+			return address;
 		}
-		}
-		
+
 		// Return null or throw an error if no token found
 		return null;
 	}
