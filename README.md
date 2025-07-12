@@ -1,4 +1,4 @@
-# Kaisen-Assistant
+# Kaisen-Assistant [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/KaisenAssistant/Kaisen-Assistant1)
 
 ## Overview
 Kaisen-Assistant is an advanced multi-agent system designed to handle specialized tasks across blockchain operations, trading analysis, and general queries. Powered by sophisticated natural language processing, the platform leverages a comprehensive suite of blockchain tools including Joule Protocol for DeFi operations, Panora for cross-chain trading, Twitter sentiment analysis for market intelligence without API dependencies, and CoinGecko integration for Aptos-chain token verification. The system utilizes a manager-agent architecture to intelligently route user queries to the appropriate specialized agent based on intent recognition, ensuring efficient and accurate responses while maintaining seamless context across complex blockchain interactions.
