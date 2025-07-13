@@ -1,7 +1,7 @@
 import type { AccountAddress, Aptos, MoveStructId } from "@aptos-labs/ts-sdk"
 import { AptosPriceServiceConnection } from "@pythnetwork/pyth-aptos-js"
 import { priceFeed } from "./constants/price-feed"
-import type { BaseSigner } from "./signers"
+import { BaseSigner } from "./signers"
 import {
 	borrowToken,
 	burnNFT,

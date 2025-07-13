@@ -30,7 +30,7 @@ export async function createImage(
 		})
 
 		return {
-			images: response.data.map((img: any) => img.url),
+			images: response.data?.map((img: any) => img.url) ?? [],
 		}
 	} catch (error: any) {
 		throw new Error(`Image generation failed: ${error.message}`)

@@ -1,5 +1,6 @@
 import { Scraper, Tweet } from "@the-convocation/twitter-scraper";
-import { Tool } from "langchain/tools";
+import { DynamicStructuredTool } from "@langchain/core/tools";
+import { z } from "zod";
 
 // Define the SafeTweet interface
 interface SafeTweet extends Tweet {
@@ -11,53 +12,55 @@ interface TwitterScraperOptions {
   maxTweets?: number;
 }
 
-class TwitterScraperTool extends Tool {
-  name = "twitter_trend_analyzer";
-  description = "Scrapes Twitter for trending topics and crypto-related tweets";
+class TwitterScraperTool extends DynamicStructuredTool {
   private scraper: Scraper;
 
   constructor() {
-    super();
-    this.scraper = new Scraper();
-  }
-
-  async _call(args: string): Promise<string> {
-    try {
-      // Parse input arguments
-      const options: TwitterScraperOptions = JSON.parse(args);
-      
-      // Validate input
-      if (!options.query) {
-        throw new Error("Search query is required");
-      }
-      
-      // Set default max tweets if not specified
-      const maxTweets = options.maxTweets || 50;
-      
-      // Collect tweets
-      const tweets: SafeTweet[] = [];
-      
-      // Use getTweets method
-      for await (const tweet of this.scraper.getTweets(options.query, maxTweets)) {
-        // Ensure tweet has text property
-        if (tweet && typeof tweet.text === 'string') {
-          tweets.push(tweet as SafeTweet);
+    super({
+      name: "twitter_trend_analyzer",
+      description: "Scrapes Twitter for trending topics and crypto-related tweets. Use this to get real-time Twitter data and analyze crypto trends, hashtags, and sentiment patterns.",
+      schema: z.object({
+        query: z.string().describe("The Twitter search query to analyze (e.g., 'bitcoin', 'ethereum', 'crypto trading')"),
+        maxTweets: z.number().optional().describe("Maximum number of tweets to collect (default: 50)")
+      }),
+      func: async (input: { query: string; maxTweets?: number }) => {
+        const scraper = new Scraper();
+        try {
+          // Validate input
+          if (!input.query) {
+            throw new Error("Search query is required");
+          }
+          
+          // Set default max tweets if not specified
+          const maxTweets = input.maxTweets || 50;
+          
+          // Collect tweets
+          const tweets: SafeTweet[] = [];
+          
+          // Use getTweets method
+          for await (const tweet of scraper.getTweets(input.query, maxTweets)) {
+            // Ensure tweet has text property
+            if (tweet && typeof tweet.text === 'string') {
+              tweets.push(tweet as SafeTweet);
+            }
+          }
+          
+          // Analyze tweets for crypto trends
+          const analysis = this.analyzeTweets(tweets);
+          return JSON.stringify({
+            query: input.query,
+            totalTweets: tweets.length,
+            analysis
+          });
+        } catch (error) {
+          return JSON.stringify({
+            error: error instanceof Error ? error.message : 'Unknown error',
+            errorType: 'TWITTER_SCRAPE_FAILED'
+          });
         }
       }
-      
-      // Analyze tweets for crypto trends
-      const analysis = this.analyzeTweets(tweets);
-      return JSON.stringify({
-        query: options.query,
-        totalTweets: tweets.length,
-        analysis
-      });
-    } catch (error) {
-      return JSON.stringify({
-        error: error instanceof Error ? error.message : 'Unknown error',
-        errorType: 'TWITTER_SCRAPE_FAILED'
-      });
-    }
+    });
+    this.scraper = new Scraper();
   }
 
   // Basic sentiment and trend analysis

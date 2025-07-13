@@ -1,4 +1,4 @@
-import type { AgentRuntime } from "../../../chat-agent/agent"
+import type { AgentRuntime } from "../agent"
 import { AptosAccountAddressTool } from "./account"
 import { AmnisStakeTool, AmnisWithdrawStakeTool } from "./amnis"
 import {

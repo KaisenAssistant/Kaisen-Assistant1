@@ -18,6 +18,10 @@ export abstract class BaseSigner {
 		return this.account.accountAddress
 	}
 
+	public getAccount(): Account {
+		return this.account
+	}
+
 	//  abstract getAccount(): Account;
 	abstract signTransaction(transaction: AnyRawTransaction): Promise<SignedTransactionResponse>
 	abstract sendTransaction(transaction: InputTransactionData | AnyRawTransaction): Promise<string>
