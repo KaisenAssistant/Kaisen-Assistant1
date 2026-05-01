@@ -28,7 +28,7 @@
 		"langchain": "^0.3.19",
 		"marked": "^15.0.6",
 		"move-agent-kit": "^0.1.2",
-		"next": "15.1.4",
+		"next": "15.2.4",
 		"openai": "^4.87.3",
 		"react": "^19.0.0",
 		"react-dom": "^19.0.0",
